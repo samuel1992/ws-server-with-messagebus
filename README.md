@@ -51,6 +51,34 @@ Here's how a message travels through the system for the Ping service:
 6. MessageBus routes to subscribed clients
    ↓
 7. Client writeLoop receives and sends "hello" back via WebSocket
+
+```
+
+## Message bus pattern
+
+The main idea of the message bus is to be decoupled from the mechanism behind it. So if you want to replace the `InMemoryMessageBus` to a `RedisMessageBus` as long it follows the same interface you should be good.
+Example of a different message bus implementation:
+
+```go
+type RedisMessageBus struct {
+    // Redis client and other fields
+}
+
+func NewRedisMessageBus(...) *RedisMessageBus {
+    // Initialize Redis client and return instance
+}
+
+func (r *RedisMessageBus) Subscribe(topic string) (<-chan []byte, error) {
+    // Subscribe to Redis channel and return a channel for messages
+}
+
+func (r *RedisMessageBus) Unsubscribe(topic string, ch <-chan []byte) error {
+    // Unsubscribe from Redis channel
+}
+
+func (r *RedisMessageBus) Publish(topic string, message []byte) error {
+    // Publish message to Redis channel
+}
 ```
 
 ## Key Features
@@ -75,6 +103,7 @@ The server starts on `localhost:8080`.
 ### Test with WebSocket Clients
 
 **Ping Service** (echo messages):
+
 ```bash
 # Using websocat or similar WebSocket client
 websocat ws://localhost:8080/ws/ping
@@ -83,6 +112,7 @@ websocat ws://localhost:8080/ws/ping
 ```
 
 **TimeNow Service** (receive time updates every 2 seconds):
+
 ```bash
 websocat ws://localhost:8080/ws/timenow
 < 2025-12-22T10:30:00Z
@@ -114,6 +144,7 @@ websocat ws://localhost:8080/ws/timenow
 ## Why This Pattern?
 
 This architecture is ideal for scenarios where:
+
 - Multiple clients need to receive the same events (fan-out)
 - Services should be reusable and not tied to specific clients
 - You want to add new services without modifying existing code
