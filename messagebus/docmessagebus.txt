@@ -1,0 +1,130 @@
+// Package messagebus implements a thread-safe in-memory message bus using the Publish-Subscribe pattern.
+//
+// DESIGN PATTERNS:
+// - Publish-Subscribe (Pub/Sub): Decouples message producers from consumers via topic-based routing
+// - Observer Pattern: Subscribers register to observe and receive notifications about topic events
+// - Fan-Out Pattern: Broadcasts messages to multiple subscribers simultaneously
+// - Readers-Writer Lock: Optimizes concurrent access (many readers, few writers)
+//
+// CONCURRENCY MODEL:
+// - Thread-safe using sync.RWMutex
+// - Non-blocking message delivery with buffered channels (256 messages per subscriber)
+// - Graceful degradation: drops messages if subscriber channel is full
+package messagebus
+
+import (
+	"log"
+	"sync"
+)
+
+// MessageBus is a thread-safe in-memory message broker.
+//
+// CONCURRENCY PATTERN - Readers-Writer Lock:
+// Uses sync.RWMutex to allow multiple concurrent readers (Write operations)
+// while ensuring exclusive access for writers (Subscribe/Unsubscribe operations).
+type MessageBus struct {
+	mu sync.RWMutex
+
+	// subscribers is a map of topic -> list of channels
+	// Structure: map[topic][]channel
+	// - Key: topic name (e.g., "vili01/3000:from-ws-to-hub")
+	// - Value: slice of subscriber channels
+	// Example: subscribers["chat:from-ws-to-hub"] = [chan1, chan2, chan3]
+	// Each channel is unique (different memory address), so no duplicates possible
+	subscribers map[string][]chan []byte
+}
+
+func NewMessageBus() *MessageBus {
+	return &MessageBus{
+		subscribers: make(map[string][]chan []byte),
+	}
+}
+
+// Subscribe registers a client to receive messages from a topic.
+//
+// DESIGN PATTERNS:
+//
+//  1. OBSERVER PATTERN:
+//     Clients register as observers to be notified when events occur on a topic.
+//     The MessageBus maintains a list of observers and notifies them via channels.
+//
+//  2. FACTORY METHOD PATTERN:
+//     Creates and returns a new channel object for each subscriber.
+//     Each subscriber gets its own dedicated channel, ensuring independent message processing.
+//
+// RETURNS:
+// A buffered channel (256 messages) that will receive messages published to the topic.
+// The channel is owned by the subscriber and should be read from in a goroutine.
+func (mb *MessageBus) Subscribe(topic string) chan []byte {
+	mb.mu.Lock()
+	defer mb.mu.Unlock()
+
+	// Factory Method: Create a new channel for this subscriber
+	ch := make(chan []byte, 256)
+
+	// Registry Pattern: Add the channel to the topic's subscriber list
+	mb.subscribers[topic] = append(mb.subscribers[topic], ch)
+
+	return ch
+}
+
+// Unsubscribe removes a client's subscription and cleans up resources.
+func (mb *MessageBus) Unsubscribe(topic string, ch chan []byte) {
+	mb.mu.Lock()
+	defer mb.mu.Unlock()
+
+	channels := mb.subscribers[topic]
+	for i, c := range channels {
+		if c == ch {
+			// Remove channel from registry
+			mb.subscribers[topic] = append(channels[:i], channels[i+1:]...)
+
+			// Resource Cleanup: Close the channel to signal completion
+			close(ch)
+			break
+		}
+	}
+}
+
+// Write publishes a message to all subscribers of a topic.
+//
+// DESIGN PATTERNS:
+//
+//  1. FAN-OUT (BROADCAST) PATTERN:
+//     Sends one message to multiple receivers simultaneously.
+//     All subscribers receive the same message on their individual channels.
+//     This allows multiple independent listeners to process the same message in parallel.
+//
+//  2. NON-BLOCKING SEND PATTERN:
+//     Uses select with default case to avoid blocking if a subscriber's channel is full.
+//     This prevents a slow/stuck subscriber from blocking the entire message bus.
+//     Messages are dropped for full channels with a warning log.
+//
+// CONCURRENCY:
+//
+//  1. READERS-WRITER LOCK PATTERN:
+//     Uses RLock() instead of Lock() because publishing is a read operation on the
+//     subscribers map (we read the list of channels but don't modify the map structure).
+//     This allows multiple concurrent Write operations, improving throughput.
+//
+// PERFORMANCE:
+// - Multiple publishers can write to different topics simultaneously (RLock allows concurrent reads)
+// - Non-blocking sends prevent cascade failures from slow subscribers
+// - Buffered channels (256 msg) provide elasticity for bursty traffic
+func (mb *MessageBus) Write(topic string, msg []byte) {
+	mb.mu.RLock() // Read lock: allows concurrent writes to different topics
+	defer mb.mu.RUnlock()
+
+	// Fan-out: Broadcast the message to ALL subscriber channels
+	for _, ch := range mb.subscribers[topic] {
+		// Non-blocking send: don't wait if channel is full
+		select {
+		case ch <- msg:
+			// Message delivered successfully
+		default:
+			// Channel full - drop message and log warning
+			// This prevents a slow subscriber from blocking the entire bus
+			log.Printf("Warning: subscriber channel full, dropping message")
+		}
+	}
+}
