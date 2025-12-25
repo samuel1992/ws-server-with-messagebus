@@ -33,7 +33,6 @@ func NewServiceRegistry(bus messagebus.MessageBus) *ServiceRegistry {
 }
 
 func (r *ServiceRegistry) Add(endpoint string, service Service) error {
-	// Start the provided service
 	bgCtx := context.Background()
 	err := service.Start(bgCtx)
 	if err != nil {
@@ -53,7 +52,6 @@ func (r *ServiceRegistry) Add(endpoint string, service Service) error {
 	return nil
 }
 
-// GetOrAdd returns an existing service or adds the provided one
 func (r *ServiceRegistry) Get(endpoint string) (Service, error) {
 	r.mu.RLock()
 	entry, exists := r.services[endpoint]
@@ -100,7 +98,6 @@ func (r *ServiceRegistry) Release(endpoint string) {
 	}
 }
 
-// StopAll stops all services regardless of reference count
 func (r *ServiceRegistry) StopAll() {
 	r.mu.Lock()
 	defer r.mu.Unlock()

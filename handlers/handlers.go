@@ -12,14 +12,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Handlers struct {
+type WS struct {
 	registry *services.ServiceRegistry
 	bus      messagebus.MessageBus
 	upgrader websocket.Upgrader
 }
 
-func NewHandlers(registry *services.ServiceRegistry, bus messagebus.MessageBus) *Handlers {
-	return &Handlers{
+func NewWSHandler(registry *services.ServiceRegistry, bus messagebus.MessageBus) *WS {
+	return &WS{
 		registry: registry,
 		bus:      bus,
 		upgrader: websocket.Upgrader{
@@ -32,7 +32,7 @@ func NewHandlers(registry *services.ServiceRegistry, bus messagebus.MessageBus) 
 
 type ServiceFactory func(bus messagebus.MessageBus, fromWsToService, fromServiceToWs string) services.Service
 
-func (h *Handlers) HandleWs(w http.ResponseWriter, r *http.Request, serviceFactory ServiceFactory) {
+func (h *WS) Handle(w http.ResponseWriter, r *http.Request, serviceFactory ServiceFactory) {
 	endpoint := strings.TrimPrefix(r.URL.Path, "/ws/")
 
 	fromWsToService := endpoint + ":from-ws-to-service"

@@ -1,10 +1,11 @@
 package ws
 
 import (
-	"github.com/samuel1992/ws-server-with-messagebus/messagebus"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/samuel1992/ws-server-with-messagebus/messagebus"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,7 +16,7 @@ type Client struct {
 	readTopic    string
 	writeTopic   string
 	sendToWsConn chan []byte
-	done         chan struct{} // Signals when both goroutines are done
+	done         chan struct{}
 }
 
 func NewClient(conn *websocket.Conn, mb messagebus.MessageBus, readTopic, writeTopic string) *Client {

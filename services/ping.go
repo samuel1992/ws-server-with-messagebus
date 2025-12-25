@@ -7,12 +7,6 @@ import (
 	"github.com/samuel1992/ws-server-with-messagebus/messagebus"
 )
 
-// Service interface that all background services should implement
-// type Service interface {
-// 	Start(ctx context.Context) error
-// 	Stop() error
-// }
-
 type PingService struct {
 	bus        messagebus.MessageBus
 	readTopic  string

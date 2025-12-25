@@ -15,15 +15,14 @@ func main() {
 
 	messageBus := messagebus.NewMessageBus()
 	serviceRegistry := services.NewServiceRegistry(messageBus)
-	handlers := handlers.NewHandlers(serviceRegistry, messageBus)
+	handler := handlers.NewWSHandler(serviceRegistry, messageBus)
 
-	// The handler now accepts the message bus and service registry.
 	http.HandleFunc("/ws/ping", func(w http.ResponseWriter, r *http.Request) {
-		handlers.HandleWs(w, r, services.NewPingService)
+		handler.Handle(w, r, services.NewPingService)
 	})
 
 	http.HandleFunc("/ws/timenow", func(w http.ResponseWriter, r *http.Request) {
-		handlers.HandleWs(w, r, services.NewTimeNowService)
+		handler.Handle(w, r, services.NewTimeNowService)
 	})
 
 	log.Printf("Starting server on %v\n", port)
