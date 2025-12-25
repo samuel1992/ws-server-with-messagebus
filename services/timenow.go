@@ -17,7 +17,7 @@ type TimeNowService struct {
 	stopped chan struct{}
 }
 
-func NewTimeNowService(mb messagebus.MessageBus, readTopic, writeTopic string) *TimeNowService {
+func NewTimeNowService(mb messagebus.MessageBus, readTopic, writeTopic string) Service {
 	return &TimeNowService{
 		bus:        mb,
 		readTopic:  readTopic,

@@ -19,11 +19,11 @@ func main() {
 
 	// The handler now accepts the message bus and service registry.
 	http.HandleFunc("/ws/ping", func(w http.ResponseWriter, r *http.Request) {
-		handlers.HandlePing(w, r)
+		handlers.HandleWs(w, r, services.NewPingService)
 	})
 
 	http.HandleFunc("/ws/timenow", func(w http.ResponseWriter, r *http.Request) {
-		handlers.HandleTimeNow(w, r)
+		handlers.HandleWs(w, r, services.NewTimeNowService)
 	})
 
 	log.Printf("Starting server on %v\n", port)

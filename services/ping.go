@@ -22,7 +22,7 @@ type PingService struct {
 	stopped chan struct{}
 }
 
-func NewPingService(mb messagebus.MessageBus, readTopic, writeTopic string) *PingService {
+func NewPingService(mb messagebus.MessageBus, readTopic, writeTopic string) Service {
 	return &PingService{
 		bus:        mb,
 		readTopic:  readTopic,
