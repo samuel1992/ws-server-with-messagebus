@@ -13,7 +13,13 @@ import (
 func main() {
 	port := ":3000"
 
-	messageBus := messagebus.NewMessageBus()
+	// If you decide to use redis as message bus for example:
+	// options := &redis.Options{
+	// 	Addr: "localhost:6378",
+	// }
+	// messageBus := messagebus.NewRedisMessageBus(options)
+
+	messageBus := messagebus.NewInMemoryMessageBus()
 	serviceRegistry := services.NewServiceRegistry(messageBus)
 	handler := handlers.NewWSHandler(serviceRegistry, messageBus)
 

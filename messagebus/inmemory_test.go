@@ -7,7 +7,7 @@ import (
 )
 
 func TestBasicPubSub(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 	topic := "test-topic"
 
 	ch := bus.Subscribe(topic)
@@ -24,7 +24,7 @@ func TestBasicPubSub(t *testing.T) {
 }
 
 func TestMultipleSubscribersSameTopic(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 	topic := "test-topic"
 
 	ch1 := bus.Subscribe(topic)
@@ -47,7 +47,7 @@ func TestMultipleSubscribersSameTopic(t *testing.T) {
 }
 
 func TestTopicIsolation(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 
 	ch1 := bus.Subscribe("topic1")
 	ch2 := bus.Subscribe("topic2")
@@ -87,7 +87,7 @@ func TestTopicIsolation(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 	topic := "test-topic"
 
 	ch := bus.Subscribe(topic)
@@ -118,7 +118,7 @@ func TestUnsubscribe(t *testing.T) {
 }
 
 func TestFullChannelDropsMessage(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 	topic := "test-topic"
 
 	ch := bus.Subscribe(topic)
@@ -143,7 +143,7 @@ func TestFullChannelDropsMessage(t *testing.T) {
 }
 
 func TestSubscribeAfterPublish(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 	topic := "test-topic"
 
 	bus.Publish(topic, []byte("old"))
@@ -169,7 +169,7 @@ func TestSubscribeAfterPublish(t *testing.T) {
 }
 
 func TestPublishToTopicWithNoSubscribers(t *testing.T) {
-	bus := NewMessageBus()
+	bus := NewInMemoryMessageBus()
 
 	bus.Publish("nonexistent", []byte("test"))
 }

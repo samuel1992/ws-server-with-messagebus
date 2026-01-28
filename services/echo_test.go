@@ -10,7 +10,7 @@ import (
 )
 
 func TestEchoServiceEcho(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "echo:from-ws"
 	writeTopic := "echo:to-ws"
 
@@ -39,7 +39,7 @@ func TestEchoServiceEcho(t *testing.T) {
 }
 
 func TestEchoServiceMultipleMessages(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "echo:from-ws"
 	writeTopic := "echo:to-ws"
 
@@ -69,7 +69,7 @@ func TestEchoServiceMultipleMessages(t *testing.T) {
 }
 
 func TestEchoServiceStop(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "echo:from-ws"
 	writeTopic := "echo:to-ws"
 
@@ -100,7 +100,7 @@ func TestEchoServiceStop(t *testing.T) {
 }
 
 func TestEchoServiceContextCancellation(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "echo:from-ws"
 	writeTopic := "echo:to-ws"
 

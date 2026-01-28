@@ -10,7 +10,7 @@ type InMemoryMessageBus struct {
 	subscribers map[string][]chan []byte
 }
 
-func NewMessageBus() MessageBus {
+func NewInMemoryMessageBus() MessageBus {
 	return &InMemoryMessageBus{
 		subscribers: make(map[string][]chan []byte),
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func TestTimeNowServicePublishesTime(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "time:from-ws"
 	writeTopic := "time:to-ws"
 
@@ -32,7 +32,7 @@ func TestTimeNowServicePublishesTime(t *testing.T) {
 }
 
 func TestTimeNowServiceMultiplePublishes(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "time:from-ws"
 	writeTopic := "time:to-ws"
 
@@ -60,7 +60,7 @@ func TestTimeNowServiceMultiplePublishes(t *testing.T) {
 }
 
 func TestTimeNowServiceStop(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "time:from-ws"
 	writeTopic := "time:to-ws"
 
@@ -91,7 +91,7 @@ func TestTimeNowServiceStop(t *testing.T) {
 }
 
 func TestTimeNowServiceContextCancellation(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "time:from-ws"
 	writeTopic := "time:to-ws"
 
@@ -124,7 +124,7 @@ func TestTimeNowServiceContextCancellation(t *testing.T) {
 }
 
 func TestTimeNowServiceStopBlocks(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	readTopic := "time:from-ws"
 	writeTopic := "time:to-ws"
 

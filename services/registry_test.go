@@ -34,7 +34,7 @@ func (m *mockService) stopped() int {
 }
 
 func TestRegistryAdd(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	registry := NewServiceRegistry(bus)
 
 	mock := &mockService{}
@@ -53,7 +53,7 @@ func TestRegistryAdd(t *testing.T) {
 }
 
 func TestRegistryGet(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	registry := NewServiceRegistry(bus)
 
 	mock := &mockService{}
@@ -74,7 +74,7 @@ func TestRegistryGet(t *testing.T) {
 }
 
 func TestRegistryGetNonExistent(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	registry := NewServiceRegistry(bus)
 
 	svc, err := registry.Get("nonexistent")
@@ -88,7 +88,7 @@ func TestRegistryGetNonExistent(t *testing.T) {
 }
 
 func TestRegistryReferenceCount(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	registry := NewServiceRegistry(bus)
 
 	mock := &mockService{}
@@ -118,14 +118,14 @@ func TestRegistryReferenceCount(t *testing.T) {
 }
 
 func TestRegistryReleaseNonExistent(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	registry := NewServiceRegistry(bus)
 
 	registry.Release("nonexistent")
 }
 
 func TestRegistryStopAll(t *testing.T) {
-	bus := messagebus.NewMessageBus()
+	bus := messagebus.NewInMemoryMessageBus()
 	registry := NewServiceRegistry(bus)
 
 	mock1 := &mockService{}
@@ -158,4 +158,3 @@ func TestRegistryStopAll(t *testing.T) {
 		t.Error("expected all services cleared after StopAll")
 	}
 }
-
