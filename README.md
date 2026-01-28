@@ -30,23 +30,23 @@ WebSocket Client ←→ WS Client Handler ←→ Message Bus ←→ Backend Serv
    - Enables service reuse across multiple WebSocket connections
 
 4. **Example Services** (`services/`)
-   - **PingService**: Echoes messages back to clients
+   - **EchoService**: Echoes messages back to clients
    - **TimeNowService**: Broadcasts current time every 2 seconds
 
 ## Message Flow Example
 
-Here's how a message travels through the system for the Ping service:
+Here's how a message travels through the system for the Echo service:
 
 ```
 1. Client sends "hello" via WebSocket
    ↓
-2. Client readLoop publishes to "ping:from-ws-to-service"
+2. Client readLoop publishes to "echo:from-ws-to-service"
    ↓
 3. MessageBus routes to all subscribers on that topic
    ↓
-4. PingService receives message
+4. EchoService receives message
    ↓
-5. PingService publishes "hello" to "ping:from-service-to-ws"
+5. EchoService publishes "hello" to "echo:from-service-to-ws"
    ↓
 6. MessageBus routes to subscribed clients
    ↓
@@ -102,11 +102,11 @@ The server starts on `localhost:8080`.
 
 ### Test with WebSocket Clients
 
-**Ping Service** (echo messages):
+**Echo Service** (echo messages):
 
 ```bash
 # Using websocat or similar WebSocket client
-websocat ws://localhost:8080/ws/ping
+websocat ws://localhost:8080/ws/echo
 > hello
 < hello
 ```
@@ -133,11 +133,11 @@ websocat ws://localhost:8080/ws/timenow
 │   └── client.go         # WebSocket client handler
 ├── services/
 │   ├── registry.go       # Service lifecycle manager
-│   ├── ping.go           # Ping service implementation
+│   ├── echo.go           # Echo service implementation
 │   └── timenow.go        # TimeNow service implementation
 └── handlers/
     ├── handlers.go       # Handler setup
-    ├── ping.go           # Ping endpoint handler
+    ├── echo.go           # Echo endpoint handler
     └── timenow.go        # TimeNow endpoint handler
 ```
 
