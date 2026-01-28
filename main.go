@@ -17,8 +17,8 @@ func main() {
 	serviceRegistry := services.NewServiceRegistry(messageBus)
 	handler := handlers.NewWSHandler(serviceRegistry, messageBus)
 
-	http.HandleFunc("/ws/ping", func(w http.ResponseWriter, r *http.Request) {
-		handler.Handle(w, r, services.NewPingService)
+	http.HandleFunc("/ws/echo", func(w http.ResponseWriter, r *http.Request) {
+		handler.Handle(w, r, services.NewEchoService)
 	})
 
 	http.HandleFunc("/ws/timenow", func(w http.ResponseWriter, r *http.Request) {

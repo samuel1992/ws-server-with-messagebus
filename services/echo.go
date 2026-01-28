@@ -7,7 +7,7 @@ import (
 	"github.com/samuel1992/ws-server-with-messagebus/messagebus"
 )
 
-type PingService struct {
+type EchoService struct {
 	bus        messagebus.MessageBus
 	readTopic  string
 	writeTopic string
@@ -16,8 +16,8 @@ type PingService struct {
 	stopped chan struct{}
 }
 
-func NewPingService(mb messagebus.MessageBus, readTopic, writeTopic string) Service {
-	return &PingService{
+func NewEchoService(mb messagebus.MessageBus, readTopic, writeTopic string) Service {
+	return &EchoService{
 		bus:        mb,
 		readTopic:  readTopic,
 		writeTopic: writeTopic,
@@ -25,7 +25,7 @@ func NewPingService(mb messagebus.MessageBus, readTopic, writeTopic string) Serv
 	}
 }
 
-func (s *PingService) Start(ctx context.Context) error {
+func (s *EchoService) Start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancel = cancel
 
@@ -41,9 +41,10 @@ func (s *PingService) Start(ctx context.Context) error {
 		for {
 			select {
 			case msg := <-subscription:
+				// publish the same received message to the write topic (echo)
 				s.bus.Publish(s.writeTopic, msg)
 			case <-ctx.Done():
-				log.Println("PingService stopping")
+				log.Println("EchoService stopping")
 				return
 			}
 		}
@@ -52,8 +53,8 @@ func (s *PingService) Start(ctx context.Context) error {
 	return nil
 }
 
-func (s *PingService) Stop() error {
-	log.Println("Stopping PingService")
+func (s *EchoService) Stop() error {
+	log.Println("Stopping EchoService")
 	if s.cancel != nil {
 		s.cancel()
 	}

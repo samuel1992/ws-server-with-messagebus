@@ -9,12 +9,12 @@ import (
 	"github.com/samuel1992/ws-server-with-messagebus/messagebus"
 )
 
-func TestPingServiceEcho(t *testing.T) {
+func TestEchoServiceEcho(t *testing.T) {
 	bus := messagebus.NewMessageBus()
-	readTopic := "ping:from-ws"
-	writeTopic := "ping:to-ws"
+	readTopic := "echo:from-ws"
+	writeTopic := "echo:to-ws"
 
-	service := NewPingService(bus, readTopic, writeTopic)
+	service := NewEchoService(bus, readTopic, writeTopic)
 	ctx := context.Background()
 
 	err := service.Start(ctx)
@@ -38,12 +38,12 @@ func TestPingServiceEcho(t *testing.T) {
 	service.Stop()
 }
 
-func TestPingServiceMultipleMessages(t *testing.T) {
+func TestEchoServiceMultipleMessages(t *testing.T) {
 	bus := messagebus.NewMessageBus()
-	readTopic := "ping:from-ws"
-	writeTopic := "ping:to-ws"
+	readTopic := "echo:from-ws"
+	writeTopic := "echo:to-ws"
 
-	service := NewPingService(bus, readTopic, writeTopic)
+	service := NewEchoService(bus, readTopic, writeTopic)
 	service.Start(context.Background())
 
 	outputCh := bus.Subscribe(writeTopic)
@@ -68,12 +68,12 @@ func TestPingServiceMultipleMessages(t *testing.T) {
 	service.Stop()
 }
 
-func TestPingServiceStop(t *testing.T) {
+func TestEchoServiceStop(t *testing.T) {
 	bus := messagebus.NewMessageBus()
-	readTopic := "ping:from-ws"
-	writeTopic := "ping:to-ws"
+	readTopic := "echo:from-ws"
+	writeTopic := "echo:to-ws"
 
-	service := NewPingService(bus, readTopic, writeTopic)
+	service := NewEchoService(bus, readTopic, writeTopic)
 	service.Start(context.Background())
 
 	outputCh := bus.Subscribe(writeTopic)
@@ -99,12 +99,12 @@ func TestPingServiceStop(t *testing.T) {
 	}
 }
 
-func TestPingServiceContextCancellation(t *testing.T) {
+func TestEchoServiceContextCancellation(t *testing.T) {
 	bus := messagebus.NewMessageBus()
-	readTopic := "ping:from-ws"
-	writeTopic := "ping:to-ws"
+	readTopic := "echo:from-ws"
+	writeTopic := "echo:to-ws"
 
-	service := NewPingService(bus, readTopic, writeTopic)
+	service := NewEchoService(bus, readTopic, writeTopic)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	service.Start(ctx)
